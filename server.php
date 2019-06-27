@@ -1,29 +1,32 @@
 <?php
 
-if ( 
-    !array_key_exists('HTTP_X_HASH', $_SERVER) ||
-    !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
-    !array_key_exists('HTTP_X_UID', $_SERVER)
-) {
+if ( !array_key_exists( 'HTTP_X_TOKEN', $_SERVER) ) {
 
     die;
 }
 
-list( $hash, $uid, $timestamp ) = [
-    $_SERVER['HTTP_X_HASH'],
-    $_SERVER['HTTP_X_UID'],
-    $_SERVER['HTTP_X_TIMESTAMP'],
-];
+$url = 'http://localhost:8001';
 
-$secret = 'Sh!! No se lo cuentes a nadie!';
+$ch = curl_init( $url );
+curl_setopt(
+    $ch,
+    CURLOPT_HTTPHEADER,
+    [
+        "X-Token: {$_SERVER['HTTP_X_TOKEN']}"
+    ]
+    );
+curl_setopt(
+    $ch,
+    CURLOPT_RETURNTRANSFER,
+    true
+);
 
-$newHash = sha1($uid.$timestamp.$secret);
+$ret = curl_exec( $ch );
 
-if ( $newHash !== $hash ) {
-
+if ( $ret !== 'true' ) {
+    
     die;
 }
-
 // Definimos los recursos disponibles
 $allowedResourceTypes = [
     'books',
