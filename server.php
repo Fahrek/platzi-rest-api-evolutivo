@@ -1,29 +1,27 @@
 <?php
 
-if ( !array_key_exists( 'HTTP_X_TOKEN', $_SERVER ) ) {
+if ( 
+    !array_key_exists('HTTP_X_HASH', $_SERVER) ||
+    !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
+    !array_key_exists('HTTP_X_UID', $_SERVER)
+) {
 
-	die;
+    die;
 }
 
-$url = 'http://localhost:8001';
+list( $hash, $uid, $timestamp ) = [
+    $_SERVER['HTTP_X_HASH'],
+    $_SERVER['HTTP_X_UID'],
+    $_SERVER['HTTP_X_TIMESTAMP'],
+];
 
-error_log('Autenticando contra '.$url);
+$secret = 'Sh!! No se lo cuentes a nadie!';
 
-$ch = curl_init( $url );
-curl_setopt( $ch, CURLOPT_HTTPHEADER, [
-	"X-Token: {$_SERVER['HTTP_X_TOKEN']}",
-]);
-curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-$ret = curl_exec( $ch );
+$newHash = sha1($uid.$timestamp.$secret);
 
-if ( curl_errno($ch) != 0 ) {
+if ( $newHash !== $hash ) {
 
-	die;
-}
-
-if ( $ret !== 'true' ) {
-
-	die;
+    die;
 }
 
 // Definimos los recursos disponibles
