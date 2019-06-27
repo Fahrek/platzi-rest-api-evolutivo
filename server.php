@@ -52,6 +52,14 @@ switch ( strtoupper($_SERVER['REQUEST_METHOD']) ) {
 
         break;
     case 'POST':
+        // Tomamos la entrada "cruda"
+        $json = file_get_contents('php://input');
+
+        // Transformamos el json recibido a un nuevo elemento del arreglo
+        $books[] = json_decode( $json, true );
+
+        // Emitimos hacia la salida la ultima clave del arreglo de libros
+        echo array_keys( $books )[ count($books) - 1 ];
         break;
     case 'PUT':
         break;
